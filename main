@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Redirecting...</title>
+  <script>
+    function redirect() {
+      // ตรวจสอบอุปกรณ์
+      const userAgent = navigator.userAgent;
+
+      if (/iPhone|iPad|iPod/i.test(userAgent)) {
+        // ลองเปิดแอปด้วย Deep Link
+        window.location.href = "onebangkok://app";
+
+        // หากไม่มีแอปให้เปิด App Store หลังจาก 2 วินาที
+        setTimeout(function() {
+          window.location.href = "https://apps.apple.com/th/app/one-bangkok/id6475669593";
+        }, 2000);
+      } else if (/Android/i.test(userAgent)) {
+        // ลองเปิดแอปด้วย Deep Link
+        window.location.href = "intent://app#Intent;scheme=onebangkok;package=com.onebangkok.app;end";
+
+        // หากไม่มีแอปให้เปิด Google Play Store หลังจาก 2 วินาที
+        setTimeout(function() {
+          window.location.href = "https://play.google.com/store/apps/details?id=com.onebangkok.prod";
+        }, 2000);
+      } else {
+        // หากเปิดจากเว็บให้ Redirect ไปที่เว็บไซต์หลัก
+        window.location.href = "https://www.onebangkok.com";
+      }
+    }
+
+    window.onload = redirect;
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
