@@ -55,7 +55,7 @@
       // เรียก API ของ Xano
       const apiResult = await callXanoAPI(device, os, account_id);
 
-      // ตัวอย่างการ Redirect
+      // ตัวอย่างการ Redirect ตาม Platform
       if (device === "mobile" && os === "ios") {
         window.location.href = "https://apps.apple.com/th/app/one-bangkok/id6475669593";
       } else if (device === "mobile" && os === "android") {
