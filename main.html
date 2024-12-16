@@ -3,28 +3,64 @@
 <head>
   <title>Redirecting...</title>
   <script>
-    function redirect() {
-      // ตรวจสอบอุปกรณ์
+    // ฟังก์ชันดึงค่า Query Parameter
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // ฟังก์ชันเรียก API ของ Xano
+    async function callXanoAPI(device, os, account_id) {
+      const apiURL = "https://xgrx-nsni-ogo5.s2.xano.io/api:2pNLvKQZ/checkAppSource";
+
+      try {
+        const response = await fetch(apiURL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            device: device,
+            os: os,
+            account_id: account_id || "guest" // ค่าเริ่มต้นถ้าไม่มี account_id
+          })
+        });
+
+        const result = await response.json();
+        console.log("API Response:", result);
+        return result;
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    }
+
+    // ฟังก์ชันตรวจสอบและ Redirect
+    async function redirect() {
       const userAgent = navigator.userAgent;
+      let device = "web";
+      let os = "web";
 
+      // ตรวจสอบ account_id จาก URL
+      const account_id = getQueryParam("account_id");
+
+      // ตรวจสอบระบบปฏิบัติการ
       if (/iPhone|iPad|iPod/i.test(userAgent)) {
-        // ลองเปิดแอปด้วย Deep Link
-        window.location.href = "onebangkok://app";
-
-        // หากไม่มีแอปให้เปิด App Store หลังจาก 2 วินาที
-        setTimeout(function() {
-          window.location.href = "https://apps.apple.com/th/app/one-bangkok/id6475669593";
-        }, 2000);
+        device = "mobile";
+        os = "ios";
       } else if (/Android/i.test(userAgent)) {
-        // ลองเปิดแอปด้วย Deep Link
-        window.location.href = "intent://app#Intent;scheme=onebangkok;package=com.onebangkok.app;end";
+        device = "mobile";
+        os = "android";
+      }
 
-        // หากไม่มีแอปให้เปิด Google Play Store หลังจาก 2 วินาที
-        setTimeout(function() {
-          window.location.href = "https://play.google.com/store/apps/details?id=com.onebangkok.prod";
-        }, 2000);
+      // เรียก API ของ Xano
+      const apiResult = await callXanoAPI(device, os, account_id);
+
+      // ตัวอย่างการ Redirect
+      if (device === "mobile" && os === "ios") {
+        window.location.href = "https://apps.apple.com/app/one-bangkok";
+      } else if (device === "mobile" && os === "android") {
+        window.location.href = "https://play.google.com/store/apps/details?id=com.onebangkok.app";
       } else {
-        // หากเปิดจากเว็บให้ Redirect ไปที่เว็บไซต์หลัก
         window.location.href = "https://www.onebangkok.com";
       }
     }
